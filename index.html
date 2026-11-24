@@ -1,0 +1,239 @@
+<meta charset="utf-8">
+<title>Blind Spot Canvas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: the Game Design Canvas, filled — header strip, a 3-column grid with the MDA
+   core stacked in the centre, then a resources row and a design-check footer. */
+:root{
+  --paper:#f6f3ec; --panel:#ffffff; --ink:#1b2440; --ink-soft:#5a6480; --line:#dfe3ec;
+  --head:#1f2d52; --amber:#e0821f;
+  --blue:#e8f0fb; --blueln:#bcd3f0; --green:#e7f4ec; --greenln:#b7ddc5;
+  --peach:#fdeede; --peachln:#f3cfa5; --lilac:#efe9fa; --lilacln:#cdbdef;
+  --yellow:#fdf3d6; --yellowln:#ecd98f; --mint:#e6f5f1; --mintln:#b4e0d4;
+  --shadow:0 10px 30px rgba(27,36,64,.08);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#12151c; --panel:#1b2030; --ink:#eaf0ff; --ink-soft:#9aa6c4; --line:#2b3246;
+  --head:#aebfe8; --amber:#f0a23e;
+  --blue:#1a2740; --blueln:#2f456e; --green:#17302a; --greenln:#2b5245;
+  --peach:#33261a; --peachln:#5c4327; --lilac:#241e3a; --lilacln:#413466;
+  --yellow:#2e2814; --yellowln:#564a22; --mint:#16302b; --mintln:#2a5248;
+  --shadow:0 10px 30px rgba(0,0,0,.4); color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#12151c; --panel:#1b2030; --ink:#eaf0ff; --ink-soft:#9aa6c4; --line:#2b3246;
+  --head:#aebfe8; --amber:#f0a23e;
+  --blue:#1a2740; --blueln:#2f456e; --green:#17302a; --greenln:#2b5245;
+  --peach:#33261a; --peachln:#5c4327; --lilac:#241e3a; --lilacln:#413466;
+  --yellow:#2e2814; --yellowln:#564a22; --mint:#16302b; --mintln:#2a5248;
+  --shadow:0 10px 30px rgba(0,0,0,.4); color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);line-height:1.42;
+  font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:clamp(12.5px,.92vw,15px)}
+h1,h2,h3,h4{font-family:"Space Grotesk",system-ui,sans-serif;margin:0;line-height:1.1;text-wrap:balance}
+.wrap{max-width:1280px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:clamp(16px,3vw,30px);display:flex;flex-direction:column;gap:14px}
+
+.top{text-align:center;display:flex;flex-direction:column;gap:3px;margin-bottom:2px}
+.top h1{color:var(--head);font-size:clamp(1.5rem,3.6vw,2.2rem);letter-spacing:.01em}
+.top .sub{color:var(--ink-soft);font-size:.95em}
+
+.idbar{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);
+  padding:13px 16px;display:grid;grid-template-columns:1.1fr 1fr 1.6fr;gap:18px}
+.idbar .f{display:flex;flex-direction:column;gap:3px;min-width:0}
+.idbar .lb{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:.7em;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.idbar .vl{font-weight:600}
+.idbar .vl.title{font-family:"Space Grotesk",sans-serif;font-weight:700;color:var(--amber);font-size:1.15em}
+@media (max-width:640px){.idbar{grid-template-columns:1fr}}
+
+.grid{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:14px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+
+.block{border-radius:14px;border:1.5px solid var(--line);padding:14px 15px;display:flex;flex-direction:column;gap:7px;box-shadow:var(--shadow)}
+.block h3{font-size:.98em;display:flex;align-items:baseline;gap:8px;color:var(--head)}
+.block h3 .no{font-family:"Space Grotesk",sans-serif;font-weight:700;color:var(--amber)}
+.block .q{font-size:.8em;color:var(--ink-soft);font-style:italic;margin:-2px 0 2px}
+.block ul{margin:0;padding-left:16px;display:flex;flex-direction:column;gap:4px}
+.block li{font-size:.92em}
+.block li b{font-weight:600}
+.b-blue{background:var(--blue);border-color:var(--blueln)}
+.b-green{background:var(--green);border-color:var(--greenln)}
+.b-peach{background:var(--peach);border-color:var(--peachln)}
+.b-mint{background:var(--mint);border-color:var(--mintln)}
+.b-yellow{background:var(--yellow);border-color:var(--yellowln)}
+.b-plain{background:var(--panel)}
+
+.stack{display:flex;flex-direction:column;gap:10px}
+
+/* MDA core */
+.mda{border:2px solid var(--head);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.mda .cap{background:var(--head);color:#fff;text-align:center;font-family:"Space Grotesk",sans-serif;font-weight:700;letter-spacing:.14em;font-size:.82em;padding:8px}
+.mda .seg{padding:13px 15px;display:flex;flex-direction:column;gap:6px}
+.mda .m4{background:var(--blue)} .mda .m5{background:var(--green)} .mda .m6{background:var(--lilac)}
+.mda h4{font-size:.95em;color:var(--head)}
+.mda h4 .no{color:var(--amber);font-family:"Space Grotesk",sans-serif}
+.mda .tiny{font-size:.75em;color:var(--ink-soft);font-style:italic}
+.mda ul{margin:0;padding-left:16px;display:flex;flex-direction:column;gap:3px}
+.mda li{font-size:.88em}
+.arrow{text-align:center;font-size:.76em;color:var(--ink-soft);padding:5px;font-style:italic}
+
+.core-exp{background:var(--yellow);border:1.5px solid var(--yellowln)}
+.core-exp .fill{font-size:.96em}
+.core-exp .fill b{color:var(--amber)}
+
+.check{background:var(--panel);border:1px dashed var(--line);border-radius:12px;padding:13px 16px;font-size:.9em;display:flex;flex-direction:column;gap:6px}
+.check .lb{font-family:"Space Grotesk",sans-serif;font-weight:700;color:var(--head);font-size:.95em}
+.check .path{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:7px 10px}
+.check .path b{color:var(--amber)}
+.footer{font-size:.78em;color:var(--ink-soft);text-align:center;padding-top:2px}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+
+<div class="wrap">
+  <div class="top">
+    <h1>Game Design Canvas</h1>
+    <div class="sub">Design the player experience • Start with the player, connect the system, test the experience</div>
+  </div>
+
+  <div class="idbar">
+    <div class="f"><span class="lb">Team</span><span class="vl">Tudor · Anna · Miriam · Bogi</span></div>
+    <div class="f"><span class="lb">Game title</span><span class="vl title">Blind Spot</span></div>
+    <div class="f"><span class="lb">One-line pitch</span><span class="vl">Rate the same six employees — then jump two years ahead and watch your ratings come true. A fast, competitive game that turns appraisal bias into consequences you can see.</span></div>
+  </div>
+
+  <!-- ROW 1: player / purpose / context -->
+  <div class="grid">
+    <div class="block b-blue">
+      <h3><span class="no">1</span> Player</h3>
+      <div class="q">Who is playing? What motivates them? What do they bring?</div>
+      <ul>
+        <li><b>Players (direct target group):</b> line managers who carry out performance appraisals — plus HR and aspiring managers.</li>
+        <li><b>Target group of the target group:</b> the employees these managers rate and develop.</li>
+        <li><b>Motivation:</b> competitive, want to “win”, and curious whether they are actually fair.</li>
+        <li><b>They bring:</b> real appraisal experience and strong gut opinions — exactly what the game puts to the test.</li>
+      </ul>
+    </div>
+    <div class="block b-green">
+      <h3><span class="no">2</span> Purpose</h3>
+      <div class="q">Why make this game? What should players learn or experience?</div>
+      <ul>
+        <li>Let managers <b>feel their own rating bias</b> — halo, recency, affinity, visibility, commitment bias.</li>
+        <li>Show that <b>fair, transparent instruments</b> (evidence log, rubric, 360°) produce fairer, more accurate ratings.</li>
+        <li><b>Behaviour goal:</b> shift from gut-rating to <b>evidence-based rating</b> in the real appraisal cycle.</li>
+      </ul>
+    </div>
+    <div class="block b-peach">
+      <h3><span class="no">3</span> Context</h3>
+      <div class="q">Where, when and with whom? What platform or real situation matters?</div>
+      <ul>
+        <li><b>Where/when:</b> a management-training session / the GES closure — live, in person, ~15–20 min.</li>
+        <li><b>Setup:</b> one laptop + projector, a facilitator, 2–4 small teams playing on one shared screen.</li>
+        <li><b>Real-world situation:</b> the annual performance-appraisal and rating cycle.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ROW 2: narrative / MDA core / feedback -->
+  <div class="grid">
+    <div class="block b-peach">
+      <h3><span class="no">7</span> Narrative &amp; World</h3>
+      <div class="q">Setting, story, theme, role? How does it support the experience?</div>
+      <ul>
+        <li><b>Setting:</b> “appraisal season” at a fictional firm.</li>
+        <li><b>Role:</b> you <b>are</b> the line manager reviewing your six direct reports.</li>
+        <li><b>Characters:</b> recognisable archetypes — the Self-Promoter, the Quiet Workhorse, the Returner, the Recent Stumble, the Old Favourite, the Clear Star.</li>
+        <li><b>Why it works:</b> putting a face and a story on each bias makes it personal, not abstract.</li>
+      </ul>
+    </div>
+
+    <div class="stack">
+      <div class="mda">
+        <div class="cap">MDA CORE</div>
+        <div class="seg m4">
+          <h4><span class="no">4</span> Mechanics — what the designer builds</h4>
+          <div class="tiny">Rules • Actions • Goals • Resources • Constraints • Choices</div>
+          <ul>
+            <li>Teams rate the <b>same six employees</b> from 1–5; each has a hidden evidence-based “true” rating.</li>
+            <li><b>Resource:</b> 8 Insight Points per team. <b>Instruments (actions):</b> evidence log ◆1, rating rubric ◆2, 360° feedback ◆3 reveal the truth.</li>
+            <li><b>Constraint:</b> you can’t afford to investigate everyone — rate on gut or invest in evidence.</li>
+            <li><b>The twist:</b> the game jumps <b>“two years later”</b> — each rating plays out as a human consequence (thrive / coast / walk).</li>
+            <li><b>Goal / scoring:</b> accuracy to the fair rating + bias caught + evidence-based − fell for bias. Fairest manager wins.</li>
+          </ul>
+        </div>
+        <div class="arrow">↓ What behaviours emerge when players use the mechanics? ↓</div>
+        <div class="seg m5">
+          <h4><span class="no">5</span> Dynamics — what happens during play</h4>
+          <div class="tiny">Interactions • Strategies • Competition • Tension • Emergent behaviour</div>
+          <ul>
+            <li>Teams <b>argue each rating</b> — gut says one thing, the evidence another.</li>
+            <li><b>Strategy:</b> spend scarce points on the people you’re least sure about.</li>
+            <li>Players trust their gut, get burned at the reveal, then start <b>seeking evidence</b>.</li>
+            <li><b>The payoff:</b> seeing your biased ratings cost real people — and your team — two years on.</li>
+          </ul>
+        </div>
+        <div class="arrow">↓ What experience do those behaviours create? ↓</div>
+        <div class="seg m6">
+          <h4><span class="no">6</span> Aesthetics — what the player experiences</h4>
+          <div class="tiny">Challenge • Discovery • Fellowship • Narrative • Emotion</div>
+          <ul>
+            <li><b>Challenge</b> — beat rivals on fairness. <b>Discovery</b> — reveal the hidden evidence.</li>
+            <li><b>Fellowship</b> — the team debate. <b>Narrative</b> — the six archetypes.</li>
+            <li><b>Emotion</b> — the gut-punch of watching your bias make a good person walk out.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="block b-green">
+      <h3><span class="no">8</span> Feedback</h3>
+      <div class="q">How does the game communicate progress, consequences, success and change?</div>
+      <ul>
+        <li><b>During play:</b> live Insight-Point counter, “x/6 rated” progress, tags appear on reveal (OVER/UNDER-rated, EVIDENCE n/5).</li>
+        <li><b>Between turns:</b> full-screen “Team B, you’re up” handoffs keep the room oriented.</li>
+        <li><b>At the end — “two years later”:</b> each rating becomes a human outcome, a thrive / coast / walk tally, and a <b>Bias Report Card</b> naming each team’s blind spot; confetti for the fairest.</li>
+        <li><b>Change:</b> a debrief prompt turns the result into a Monday action.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ROW 3: tech / prototype / core experience -->
+  <div class="grid">
+    <div class="block b-mint">
+      <h3><span class="no">9</span> Technology &amp; Resources</h3>
+      <div class="q">What tools, materials, platform or production resources are needed?</div>
+      <ul>
+        <li><b>Format:</b> a single self-contained web page (HTML/JS) — runs in any browser, no install or login.</li>
+        <li><b>To run it:</b> a laptop, a projector/screen, a facilitator, 2–4 teams. Sound optional.</li>
+        <li><b>Backup:</b> the same design also works as a printed card deck.</li>
+        <li><b>Status:</b> playable prototype already built — only the link is needed.</li>
+      </ul>
+    </div>
+    <div class="block b-lilac" style="background:var(--lilac);border-color:var(--lilacln)">
+      <h3><span class="no">10</span> Prototype &amp; Test</h3>
+      <div class="q">Smallest playable version? What will you test, with whom, and what would you observe?</div>
+      <ul>
+        <li><b>Smallest version:</b> the current build with 2 teams and the six employees.</li>
+        <li><b>Test with:</b> ~4 classmates or line managers in one playthrough.</li>
+        <li><b>Observe:</b> Do they spend points, or rush on gut? Do they fall for the Self-Promoter? Does the reveal land the “aha”? Does the debrief spark real reflection? Is 15–20 min the right length?</li>
+      </ul>
+    </div>
+    <div class="block core-exp">
+      <h3>Core Game Experience</h3>
+      <div class="q">Complete the sentence.</div>
+      <div class="fill">“Players will <b>feel the pull of their own appraisal bias</b> and <b>discover that fair, evidence-based ratings change who thrives and who walks</b>, <b>because</b> our game lets them rate real-feeling people, then jumps two years ahead to show the human cost of the bias they missed.”</div>
+    </div>
+  </div>
+
+  <div class="check">
+    <span class="lb">Design check — trace Player → Mechanic → Dynamic → Aesthetic</span>
+    <div class="path"><b>Path 1:</b> Line manager (player) → hidden ratings + scarce Insight Points (mechanic) → must choose who to investigate and debate gut vs evidence (dynamic) → <b>Challenge + Discovery</b> (aesthetic).</div>
+    <div class="path"><b>Path 2:</b> Manager who knows these archetypes (player) → staged reveal comparing their rating to the truth (mechanic) → “I under-rated the quiet one”, discussed as a team (dynamic) → <b>Emotion + Fellowship</b> (aesthetic).</div>
+    <div class="path"><b>Assumption to test:</b> that managers will actually spend points on evidence instead of rushing on gut — the budget/time balance needs a playtest.</div>
+  </div>
+
+  <p class="footer">Game Design Workshop · MDA-centred learning canvas · Blind Spot — fair &amp; transparent performance appraisal · Team Tudor, Anna, Miriam &amp; Bogi</p>
+</div>
